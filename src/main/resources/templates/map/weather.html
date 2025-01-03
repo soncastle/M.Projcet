@@ -1,0 +1,85 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.io.*, java.net.*, org.json.simple.*, org.json.simple.parser.*" %>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>기상 정보</title>
+</head>
+<body>
+
+<h2>기상 예보</h2>
+
+<%
+    try {
+        // API 호출 URL (발급받은 서비스 키 사용)
+        String apiUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
+            + "?serviceKey=VKMTfwErQ1ejE38BK7NXXg"
+            + "&pageNo=1"
+            + "&numOfRows=10"
+            + "&dataType=JSON"
+            + "&base_date=20231229" // 예보 날짜
+            + "&base_time=0500" // 예보 시간
+            + "&nx=60" // 격자 좌표 X
+            + "&ny=127"; // 격자 좌표 Y
+
+        // URL 연결
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        // API 응답 읽기
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+        br.close();
+
+        // JSON 파싱
+        JSONParser parser = new JSONParser();
+        JSONObject jsonResponse = (JSONObject) parser.parse(sb.toString());
+        JSONObject body = (JSONObject) ((JSONObject) jsonResponse.get("response")).get("body");
+        JSONArray items = (JSONArray) ((JSONObject) body.get("items")).get("item");
+
+        // 테이블 출력
+%>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>항목</th>
+            <th>값</th>
+            <th>예보 시간</th>
+        </tr>
+    </thead>
+    <tbody>
+    <%
+        // JSON 배열을 순회하면서 항목 출력
+        for (Object obj : items) {
+            JSONObject item = (JSONObject) obj;
+            String category = (String) item.get("category"); // 데이터 항목 코드
+            String fcstValue = (String) item.get("fcstValue"); // 예보 값
+            String fcstTime = (String) item.get("fcstTime"); // 예보 시간
+    %>
+        <tr>
+            <td><%= category %></td>
+            <td><%= fcstValue %></td>
+            <td><%= fcstTime %></td>
+        </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
+
+<%
+    } catch (Exception e) {
+        // 예외 처리: 예외 발생 시 메시지 출력
+        out.println("예외 발생: " + e.getMessage());
+    }
+%>
+
+</body>
+</html>

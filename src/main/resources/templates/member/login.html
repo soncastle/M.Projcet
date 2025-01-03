@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <!-- 타임리프를 사용하여 static 자원을 불러오기 -->
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+ <div th:if="${msg}">
+        <script th:inline="javascript">
+            alert([[${msg}]]);
+        </script>
+</div>
+
+    <div class="login-container">
+        <h2>로그인</h2>
+        <form action="/member/login" method="POST">
+            <div class="form-group">
+                <label for="username">아이디</label>
+                <input type="text" id="userid" name="userid" placeholder="userid" required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" placeholder="password" required>
+            </div>
+            <button type="submit" class="login-btn">로그인</button>
+        </form>
+        <p>계정이 없으신가요? <a href="/member/register">회원가입</a></p>
+        <p><a href="/member/find">아이디 / 비밀번호 찾기</a></p>
+    </div>
+</body>
+</html>

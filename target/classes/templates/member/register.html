@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+<link rel="stylesheet" th:href="@{/css/register.css}">
+</head>
+<body>
+ <div th:if="${msg}">
+        <script th:inline="javascript">
+            alert([[${msg}]]);
+        </script>
+</div>
+    <div class="signup-container">
+        <h2>회원가입</h2>
+        <form action="/member/register" method="POST">
+        
+            <div class="form-group">
+                <label for="username">아이디</label>
+                <input type="text" id="userid" name="userid" placeholder="아이디를 입력하세요" th:value="${memberRequest.userid}?:_" required>
+            </div>
+
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" name="name" placeholder="이름을 입력하세요" th:value="${memberRequest.name}?:_" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordConform">비밀번호 확인</label>
+                <input type="password" id="passwordConform" name="passwordConform" placeholder="비밀번호를 다시 입력하세요" required>
+            </div>
+
+            <div class="form-group">
+                <label for="birth">생년월일</label>
+                <input type="date" id="birth" name="birth" th:value="${memberRequest.birth}?:_" >
+            </div>
+
+            <div class="form-group">
+                <label for="phone">전화번호</label>
+                <input type="tel" id="phone" name="phone" placeholder="010-1234-5678" th:value="${memberRequest.phone}?:_" >
+            </div>
+
+            <div class="form-group">
+                <label for="address">주소</label>
+                <input type="text" id="address" name="address" placeholder="주소를 입력하세요" th:value="${memberRequest.address}?:_" >
+            </div>
+
+            <div class="form-group">
+                <label>성별</label>
+                <div class="gender-options">
+                    <label>
+                        <input type="radio" name="gender" value="male" > 남성
+                    </label>
+                    <label>
+                        <input type="radio" name="gender" value="female"> 여성
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="signup-btn">회원가입</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>카카오 지도 연동</title>
+    
+    <!-- 카카오 지도 API 추가 -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=75bdd1f3923ca7511f9238d28b1c4b36&libraries=services" type="text/javascript"></script>
+
+    <style>
+        /* 지도 크기 설정 */
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+
+        /* 검색 UI */
+        #searchForm {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #keyword {
+            width: 300px;
+            padding: 5px;
+        }
+        #searchBtn {
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>카카오 지도 연동 및 위치 검색</h2>
+
+<!-- 검색 입력 -->
+<div id="searchForm">
+    <input type="text" id="keyword" placeholder="검색할 위치를 입력하세요" />
+    <button id="searchBtn">검색</button>
+</div>
+
+<!-- 지도 표시할 영역 -->
+<div id="map"></div>
+
+<script type="text/javascript">
+    // 지도 생성 및 초기 설정
+    var container = document.getElementById('map'); // 지도를 표시할 div
+    var options = {
+        center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울의 위도, 경도
+        level: 3 // 지도 확대 수준
+    };
+
+    var map = new kakao.maps.Map(container, options);
+
+    // 주소-좌표 변환 객체 생성
+    var geocoder = new kakao.maps.services.Geocoder();
+
+    // 검색 버튼 클릭 이벤트 처리
+    document.getElementById('searchBtn').addEventListener('click', function() {
+        var keyword = document.getElementById('keyword').value; // 입력한 검색어 가져오기
+
+        if (!keyword.trim()) {
+            alert('검색어를 입력해주세요.');
+            return;
+        }
+
+        // 주소로 좌표 검색
+        geocoder.addressSearch(keyword, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                // 검색된 좌표를 기준으로 지도 이동
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                map.setCenter(coords);
+
+                // 마커 생성
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
+
+                // 마커에 클릭 이벤트 추가 (정보창 표시)
+                var infowindow = new kakao.maps.InfoWindow({
+                    content: `<div style="padding:5px;">${keyword}</div>` // 검색어를 정보창에 표시
+                });
+                infowindow.open(map, marker);
+            } else {
+                alert('검색 결과가 없습니다.');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
