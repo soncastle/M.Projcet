@@ -1,22 +1,20 @@
 package com.acon.model;
-
-
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.acon.domain.MemberRequest;
 import com.acon.domain.MemberRespone;
+import com.acon.mapper.MemberMapper;
 
 @Repository
 public class MemberPersistenceImpl implements MemberPersistence {
-
+	
 	@Autowired
-	private SqlSession sqlSession;
+	private MemberMapper memberMapper;
 	
 	@Override
 	public void insertMember(MemberRequest dto) {
-		sqlSession.insert("com.acon.Weatherapp.insertMember", dto);
+		memberMapper.insertMember(dto);
 	}
 
 	@Override
@@ -25,17 +23,24 @@ public class MemberPersistenceImpl implements MemberPersistence {
 	}
 
 	@Override
-	public MemberRespone correctPassword() {
-		return null;
+	public String findPassword(String userid) {
+		return memberMapper.findPassword(userid);
+		
 	}
 
 	@Override
-	public int checkUserid(String userid) {
-	Integer result = sqlSession.selectOne("com.acon.Weatherapp.checkUserid", userid);
-	if(result==null) {
-		return 0;
-	}
-	else return result;
+	public Integer checkUserid(String phone) {
+	    Integer result = memberMapper.checkUserid(phone);
+	    return (result != null) ? result : 0;
 	}
 
+	@Override
+	public Integer login(String userid, String password) {
+		return memberMapper.login(userid, password);
+	}
+
+	@Override
+	public void delete(String userid, String password) {
+		memberMapper.delete(userid, password);
+	}
 }

@@ -15,7 +15,6 @@ public class MemberServiceImpl implements MemberService {
 	@Autowired
 	private MemberPersistence memberPersistence;
 	
-	
 	@Override
 	public String insertMember(MemberRequest dto, String password, String passwordConform, String userid) {
 		System.out.println(dto);
@@ -36,6 +35,17 @@ public class MemberServiceImpl implements MemberService {
 			return "false";
 		}
 	}
+	
+	public String findPassword(String userid) {
+		String result = memberPersistence.findPassword(userid);
+		return (result!=null) ? result : "wrong";
+	}
+	
+	@Override
+	public Integer login(String userid, String password) {
+		Integer result = memberPersistence.login(userid, password);
+			return (result != null) ? 100 : 0;
+	}
 
 	@Override
 	public MemberRespone responeMember() {
@@ -47,6 +57,11 @@ public class MemberServiceImpl implements MemberService {
 	public MemberRespone correctPassword() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void delete(String userid, String password) {
+		memberPersistence.delete(userid, password);
 	}
 
 }

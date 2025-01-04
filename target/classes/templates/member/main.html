@@ -6,9 +6,21 @@
 </head>
 <body>
 <h1>메인페이지 입니다.</h1>
-로그인한 회원: [[${session.user}]]
+로그인한 회원: [[${session.userid}]]
 <form method="post" action="/map/map">
 <button>지도 확인</button>
+</form>
+<form method="post" action="/member/delete">
+<input type="text" name="userid" placeholder="아이디를 입력하세요" required>
+<input type="text" name="password" placeholder="비밀번호를 입력하세요" required>
+<button>회원탈퇴</button>
+</form>
+</form>
+<form method="post" action="/member/update">
+<input type="text" name="userid" placeholder="아이디를 입력하세요" required>
+<input type="text" name="password" placeholder="비밀번호를 입력하세요" required>
+<input type="text" name="pudatePassword" placeholder="비밀번호를 입력하세요" required>
+<button>비밀번호 변경</button>
 </form>
 </body>
 </html>

@@ -1,7 +1,6 @@
 package com.acon.controller;
 
 
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,16 +30,34 @@ public class MemberController {
 	@PostMapping("/login")
 	public String LoginRequest(@RequestParam("userid") String userid,
 			@RequestParam("password") String password,
-			HttpSession session,
-			Model model) {
-		if(userid.equals("userid") && password.equals("password")) {
-			session.setAttribute("user", userid);
-			return "/member/main";
+			Model model,
+			HttpSession session) {
+		Integer result = memberService.login(userid, password);
+		if(result==100) {
+			session.setAttribute("userid", userid);
+			return "member/main";
 		}
 		else {
-			String msg = "비밀번호 및 패스워드가 틀렸습니다.";
-			model.addAttribute("msg", msg);
+			model.addAttribute("msg", "비밀번호 및 패스워드가 틀렸습니다.");
 			return "member/login";
+		}
+	}
+	@GetMapping("findPassword")
+	public String findPassword() {
+		return "member/findPassword";
+	}
+	
+	@PostMapping("/findPassword")
+	public String findPassword(@RequestParam("userid") String userid,
+								Model model) {
+		String result = memberService.findPassword(userid);
+		if(result.equals("wrong")) {
+			model.addAttribute("msg", "가입된 id가 없습니다.");
+			return "member/findPassword";
+		}
+		else{
+			model.addAttribute("msg", result);
+			return"member/findPassword";
 		}
 	}
 	
@@ -82,4 +99,37 @@ public class MemberController {
 			return "member/register";
 		}
 	}
+	
+	@PostMapping("/delete")
+	public String delete(@RequestParam("userid") String userid,
+						@RequestParam("password") String password,
+						Model model) {
+		Integer memberConfrom = memberService.login(userid, password);
+		if(memberConfrom==100) {
+			memberService.delete(userid, password);
+			model.addAttribute("msg", "회원탈퇴가 완료되었습니다.");
+			return "redirect:/";
+		}
+		else {
+			model.addAttribute("msg", "회원정보가 일치하지 않습니다.");
+			return "member/main";
+		}
+	}
+	
+//	@PostMapping("/update")
+//	public String update(@RequestParam("userid") String userid,
+//						@RequestParam("password") String password,
+//						@RequestParam("updatPassword") String updatePassword,
+//			Model model) {
+//		Integer memberConfrom = memberService.login(userid, password);
+//		if(memberConfrom==100) {
+//			memberService.updatePassword(userid, updatePassword);
+//			model.addAttribute("msg", "비밀번호가 변경되었습니다.");
+//			return "member/main";
+//		}
+//		else {
+//			model.addAttribute("msg", "회원정보가 일치하지 않습니다.");
+//			return "member/main";
+//		}
+//	}
 }

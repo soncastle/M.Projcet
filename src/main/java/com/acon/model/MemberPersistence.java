@@ -9,6 +9,8 @@ import com.acon.domain.MemberRespone;
 public interface MemberPersistence {
 	public void insertMember(MemberRequest dto);
 	public MemberRespone responeMember();
-	public MemberRespone correctPassword();
-	int checkUserid(String userid);
+	public Integer checkUserid(String userid);
+	public Integer login(String userid, String password);
+	public String findPassword(String userid);
+	public void delete(String userid, String password);
 }
