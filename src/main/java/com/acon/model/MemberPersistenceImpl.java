@@ -1,4 +1,6 @@
 package com.acon.model;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,11 +17,6 @@ public class MemberPersistenceImpl implements MemberPersistence {
 	@Override
 	public void insertMember(MemberRequest dto) {
 		memberMapper.insertMember(dto);
-	}
-
-	@Override
-	public MemberRespone responeMember() {
-		return null;
 	}
 
 	@Override
@@ -42,5 +39,15 @@ public class MemberPersistenceImpl implements MemberPersistence {
 	@Override
 	public void delete(String userid, String password) {
 		memberMapper.delete(userid, password);
+	}
+	
+	@Override
+	public MemberRespone oneList(String userid) {
+	    return memberMapper.oneList(userid);
+	}
+	
+	@Override
+	public void update(String userid, MemberRequest dto) {
+		memberMapper.update(userid, dto);
 	}
 }

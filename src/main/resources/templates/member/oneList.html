@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입</title>
+    <title>회원정보 확인</title>
 <link rel="stylesheet" th:href="@{/css/register.css}">
 </head>
 <body>
@@ -13,17 +13,14 @@
         </script>
 </div>
     <div class="signup-container">
-        <h2>회원가입</h2>
-        <form action="/member/register" method="POST">
-        
-            <div class="form-group">
-                <label for="username">아이디</label>
-                <input type="text" id="userid" name="userid" placeholder="아이디를 입력하세요" th:value="${memberRequest.userid}?:_" required>
-            </div>
+        <h2>회원정보 확인 및 변경</h2>
+        <form action="/member/update" method="POST">
+               <label for="username">아이디: </label>
+                  <input type="text" id="userid" name="userid" th:value="${memberRespone.userid}" readonly />
 
             <div class="form-group">
                 <label for="name">이름</label>
-                <input type="text" id="name" name="name" placeholder="이름을 입력하세요" th:value="${memberRequest.name}?:_" required>
+                <input type="text" id="name" name="name" placeholder="이름을 입력하세요" th:value="${memberRespone.name}?:_" required>
             </div>
 
             <div class="form-group">
@@ -38,20 +35,9 @@
 
             <div class="form-group">
                 <label for="birth">생년월일</label>
-                <input type="date" id="birth" name="birth" th:value="${memberRequest.birth}?:_" required>
+                <input type="date" id="birth" name="birth" th:value="${memberRespone.birth}?:_" required>
             </div>
-
-            <div class="form-group">
-                <label for="phone">전화번호</label>
-                <input type="tel" id="phone" name="phone" placeholder="010-1234-5678" th:value="${memberRequest.phone}?:_" required>
-            </div>
-
-            <div class="form-group">
-                <label for="address">주소</label>
-                <input type="text" id="address" name="address" placeholder="주소를 입력하세요" th:value="${memberRequest.address}?:_" required>
-            </div>
-
-            <div class="form-group">
+			<div class="form-group">
                 <label>성별</label>
                 <div class="gender-options">
                     <label>
@@ -62,8 +48,21 @@
                     </label>
                 </div>
             </div>
+            <div class="form-group">
+                <label for="phone">전화번호</label>
+                <input type="tel" id="phone" name="phone" placeholder="010-1234-5678" th:value="${memberRespone.phone}?:_" required>
+            </div>
 
-            <button type="submit" class="signup-btn">회원가입</button>
+            <div class="form-group">
+                <label for="address">주소</label>
+                <input type="text" id="address" name="address" placeholder="주소를 입력하세요" th:value="${memberRespone.address}?:_" required>
+            </div>
+            <div class="form-group">
+                <label for="address">회원가입 일자</label>
+                [[${memberRespone.create_at}]]
+            </div>
+            
+            <button type="submit" class="signup-btn">회원정보 변경</button>
         </form>
     </div>
 </body>

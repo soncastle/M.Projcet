@@ -1,7 +1,6 @@
 package com.acon.domain;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +15,5 @@ public class MemberRespone {
 	private String gender;
 	private String address;
 	private String phone;
-	private LocalDateTime timestamp; 
+	private LocalDateTime create_at;
 }

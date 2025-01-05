@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
 <body>
 <h1>메인페이지 입니다.</h1>
+ <div th:if="${msg}">
+        <script th:inline="javascript">
+            alert([[${msg}]]);
+        </script>
+</div>
 로그인한 회원: [[${session.userid}]]
 <form method="post" action="/map/map">
 <button>지도 확인</button>
 </form>
+<form method="post" action="/member/oneList">
+<input type="text" name="userid" placeholder="아이디를 입력하세요" required>
+<input type="text" name="password" placeholder="비밀번호를 입력하세요" required>
+<button>회원정보 확인 및 변경</button>
+</form>
 <form method="post" action="/member/delete">
 <input type="text" name="userid" placeholder="아이디를 입력하세요" required>
 <input type="text" name="password" placeholder="비밀번호를 입력하세요" required>
-<button>회원탈퇴</button>
-</form>
-</form>
-<form method="post" action="/member/update">
-<input type="text" name="userid" placeholder="아이디를 입력하세요" required>
-<input type="text" name="password" placeholder="비밀번호를 입력하세요" required>
-<input type="text" name="pudatePassword" placeholder="비밀번호를 입력하세요" required>
-<button>비밀번호 변경</button>
+<button>회원삭제</button>
 </form>
 </body>
 </html>

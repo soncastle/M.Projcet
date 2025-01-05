@@ -1,5 +1,5 @@
 package com.acon.service;
-
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.acon.domain.MemberRequest;
 import com.acon.domain.MemberRespone;
 import com.acon.model.MemberPersistence;
-
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -48,20 +47,18 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public MemberRespone responeMember() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public MemberRespone correctPassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void delete(String userid, String password) {
 		memberPersistence.delete(userid, password);
+	}
+	
+	@Override
+	public MemberRespone oneList(String userid) {
+		return memberPersistence.oneList(userid);
+	}
+	
+	@Override
+	public void update(String userid, MemberRequest dto) {
+		memberPersistence.update(userid, dto);
 	}
 
 }

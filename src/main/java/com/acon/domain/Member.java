@@ -15,6 +15,6 @@ public class Member {
 	private String gender;
 	private String address;
 	private String phone;
-	private LocalDateTime timestamp; 
+	private LocalDateTime create_at; 
 	private String role;
 }
