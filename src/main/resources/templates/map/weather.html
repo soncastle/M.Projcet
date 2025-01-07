@@ -1,85 +1,87 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.io.*, java.net.*, org.json.simple.*, org.json.simple.parser.*" %>
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>기상 정보</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>날씨 조회</title>
 </head>
 <body>
+    <h1>날씨 데이터 조회</h1>
 
-<h2>기상 예보</h2>
+    <!-- 날짜와 좌표 입력 폼 -->
+    <form id="weatherForm">
+        <label for="baseDate">날짜 (YYYYMMDD):</label>
+        <input type="text" id="baseDate" name="baseDate" required><br><br>
 
-<%
-    try {
-        // API 호출 URL (발급받은 서비스 키 사용)
-        String apiUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
-            + "?serviceKey=VKMTfwErQ1ejE38BK7NXXg"
-            + "&pageNo=1"
-            + "&numOfRows=10"
-            + "&dataType=JSON"
-            + "&base_date=20231229" // 예보 날짜
-            + "&base_time=0500" // 예보 시간
-            + "&nx=60" // 격자 좌표 X
-            + "&ny=127"; // 격자 좌표 Y
+        <label for="baseTime">시간 (HHMM):</label>
+        <input type="text" id="baseTime" name="baseTime" required><br><br>
 
-        // URL 연결
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+        <label for="nx">NX:</label>
+        <input type="text" id="nx" name="nx" value="60" required><br><br>
 
-        // API 응답 읽기
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-        br.close();
+        <label for="ny">NY:</label>
+        <input type="text" id="ny" name="ny" value="127" required><br><br>
 
-        // JSON 파싱
-        JSONParser parser = new JSONParser();
-        JSONObject jsonResponse = (JSONObject) parser.parse(sb.toString());
-        JSONObject body = (JSONObject) ((JSONObject) jsonResponse.get("response")).get("body");
-        JSONArray items = (JSONArray) ((JSONObject) body.get("items")).get("item");
+        <button type="submit">날씨 조회</button>
+    </form>
 
-        // 테이블 출력
-%>
+    <h2>날씨 결과:</h2>
+    <pre id="weatherResult"></pre>
 
-<table border="1">
-    <thead>
-        <tr>
-            <th>항목</th>
-            <th>값</th>
-            <th>예보 시간</th>
-        </tr>
-    </thead>
-    <tbody>
-    <%
-        // JSON 배열을 순회하면서 항목 출력
-        for (Object obj : items) {
-            JSONObject item = (JSONObject) obj;
-            String category = (String) item.get("category"); // 데이터 항목 코드
-            String fcstValue = (String) item.get("fcstValue"); // 예보 값
-            String fcstTime = (String) item.get("fcstTime"); // 예보 시간
-    %>
-        <tr>
-            <td><%= category %></td>
-            <td><%= fcstValue %></td>
-            <td><%= fcstTime %></td>
-        </tr>
-    <%
-        }
-    %>
-    </tbody>
-</table>
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 현재 날짜와 시간을 설정하는 함수
+            const setCurrentDateTime = () => {
+                const now = new Date();
 
-<%
-    } catch (Exception e) {
-        // 예외 처리: 예외 발생 시 메시지 출력
-        out.println("예외 발생: " + e.getMessage());
-    }
-%>
+                // 현재 날짜 (YYYYMMDD 형식)
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const baseDate = `${year}${month}${day}`;
 
+                // 현재 시간 (기상청 API 기준으로 가장 가까운 3시간 단위 HHMM 형식)
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const roundedHours = hours - (hours % 3); // 3시간 단위로 내림
+                const baseTime = `${String(roundedHours).padStart(2, '0')}00`;
+
+                // HTML 입력 필드에 설정
+                document.getElementById('baseDate').value = baseDate;
+                document.getElementById('baseTime').value = baseTime;
+            };
+
+            // 현재 날짜와 시간을 자동으로 설정
+            setCurrentDateTime();
+
+            // 폼 제출 이벤트 처리
+            document.getElementById('weatherForm').addEventListener('submit', function (e) {
+                e.preventDefault(); // 폼 제출 기본 동작 방지
+
+                // 사용자 입력 값 가져오기
+                const baseDate = document.getElementById('baseDate').value;
+                const baseTime = document.getElementById('baseTime').value;
+                const nx = document.getElementById('nx').value;
+                const ny = document.getElementById('ny').value;
+
+                // 기상청 API URL
+                const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=fT2vGIbykMvAcCsiXiq2e82IeJrI2Uh6cni7eyh9jHn2cYVup9%2BWdnE8vb%2FYoChOXBGIdWSfD%2Fax1ZNrRYhy8Q%3D%3D&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}&numOfRows=10&pageNo=1&dataType=JSON`;
+                // Fetch 요청 보내기
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const result = data.response.header.resultCode === '00'
+                            ? data.response.body.items.item
+                            : '데이터를 불러올 수 없습니다.';
+                        document.getElementById('weatherResult').textContent = JSON.stringify(result, null, 2);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('weatherResult').textContent = '날씨 데이터를 가져오는 중 오류가 발생했습니다.';
+                    });
+            });
+        });
+    </script>
 </body>
 </html>

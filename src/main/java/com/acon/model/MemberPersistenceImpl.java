@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.acon.domain.Member;
 import com.acon.domain.MemberRequest;
 import com.acon.domain.MemberRespone;
 import com.acon.mapper.MemberMapper;
@@ -49,5 +50,9 @@ public class MemberPersistenceImpl implements MemberPersistence {
 	@Override
 	public void update(String userid, MemberRequest dto) {
 		memberMapper.update(userid, dto);
+	}
+	
+	public List<Member> list(){
+		return memberMapper.list();
 	}
 }

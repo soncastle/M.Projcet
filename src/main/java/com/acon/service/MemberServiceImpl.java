@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.acon.domain.Member;
 import com.acon.domain.MemberRequest;
 import com.acon.domain.MemberRespone;
 import com.acon.model.MemberPersistence;
@@ -22,19 +23,19 @@ public class MemberServiceImpl implements MemberService {
 			return "good";
 		}
 		else if(password!=passwordConform && memberPersistence.checkUserid(userid)==0){
-			return "password";
+			return "비밀번호가 일치하지 않습니다.";
 		}
 		else if(password.equals(passwordConform) && memberPersistence.checkUserid(userid)>0) {
-			return "userid";
+			return "아이디가 중복되었습니다.";
 		}
 		else if(password!=passwordConform && memberPersistence.checkUserid(userid)>0) {
-			return "allfulse";
+			return "이미 가입된 아이디가 있으며, 비밀번호가 일치하지 않습니다.";
 		}
 		else {
-			return "false";
+			return "잘못된 접근입니다.";
 		}
 	}
-	
+	@Override
 	public String findPassword(String userid) {
 		String result = memberPersistence.findPassword(userid);
 		return (result!=null) ? result : "wrong";
@@ -60,5 +61,19 @@ public class MemberServiceImpl implements MemberService {
 	public void update(String userid, MemberRequest dto) {
 		memberPersistence.update(userid, dto);
 	}
-
+	
+	public List<Member> list(){
+		return memberPersistence.list();
+		
+	}
+	
+	@Override
+	public boolean passwordConform(String password, String passwordConform) {
+		if(password!=passwordConform) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
 }

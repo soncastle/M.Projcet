@@ -1,6 +1,7 @@
 package com.acon.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -9,8 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MapController {
 	
 	@PostMapping("/map")
-	public String Map() {
-		return "/map/map";
+	public String map() {
+		return "map/map";
+	}
+	
+	@GetMapping("/weather")
+	public String weather() {
+		return "map/weather";
 	}
 
 }

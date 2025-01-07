@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.acon.domain.Member;
 import com.acon.domain.MemberRequest;
 import com.acon.domain.MemberRespone;
 import com.acon.model.MemberPersistence;
@@ -32,7 +33,7 @@ public class MemberController {
 		return "/member/login";
 	}
 	@PostMapping("/login")
-	public String LoginRequest(@RequestParam("userid") String userid,
+	public String Login(@RequestParam("userid") String userid,
 			@RequestParam("password") String password,
 			Model model,
 			HttpSession session) {
@@ -80,21 +81,13 @@ public class MemberController {
 								@ModelAttribute MemberRequest memberRequest,
 								Model model) {
 		String result = memberService.insertMember(memberRequest, password, passwordConform, userid);
-			if(result.equals("password")) {
-				model.addAttribute("msg", "비밀번호와 패스워드가 일치하지 않습니다.");
+			if(result.equals("비밀번호가 일치하지 않습니다.") || result.equals("아이디가 중복되었습니다.") || result.equals("이미 가입된 아이디가 있으며, 비밀번호가 일치하지 않습니다.")) {
+				model.addAttribute("msg", result);
 				return "member/register";
-		}
-		else if(result.equals("userid")){
-			model.addAttribute("msg", "아이디가 중복되었습니다.");
-			return "member/register";
 		}
 		else if(result.equals("good")){
 			return "member/registerConform";
-		}
-		else if(result.equals("allfulse")) {
-			return "member/register";
-		}
-		else {
+		}else {
 			model.addAttribute("msg", "잘못된 접근입니다.");
 			return "member/register";
 		}
@@ -103,11 +96,13 @@ public class MemberController {
 	@PostMapping("/delete")
 	public String delete(@RequestParam("userid") String userid,
 						@RequestParam("password") String password,
+						HttpSession session,
 						Model model) {
 		Integer memberConfrom = memberService.login(userid, password);
 		if(memberConfrom==100) {
 			memberService.delete(userid, password);
 			model.addAttribute("msg", "회원탈퇴가 완료되었습니다.");
+			session.invalidate();
 			return "member/login";
 		}
 		else {
