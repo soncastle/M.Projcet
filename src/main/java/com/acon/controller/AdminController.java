@@ -30,6 +30,7 @@ public class AdminController {
 		return "admin/adminLogin";
 	}
 	
+	@PostMapping("/list")
 	@GetMapping("/list")
 	public String list(Model model) {
 		List<Member> users = (List<Member>)memberService.list();

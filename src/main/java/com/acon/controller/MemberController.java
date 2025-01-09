@@ -146,5 +146,13 @@ public class MemberController {
 			model.addAttribute("msg", "비밀번호가 일치하지 않습니다.");
 			return "member/oneList";
 		}
+	
+	}
+	@GetMapping("/logout")
+	public String logout(HttpSession session,
+						Model model) {
+		session.invalidate();
+		model.addAttribute("msg", "로그아웃이 완료되었습니다.");
+		return "member/login";
 	}
 }
