@@ -81,9 +81,9 @@ public class MemberController {
 								@ModelAttribute MemberRequest memberRequest,
 								Model model) {
 		String result = memberService.insertMember(memberRequest, password, passwordConform, userid);
-			if(result.equals("비밀번호가 일치하지 않습니다.") || result.equals("아이디가 중복되었습니다.") || result.equals("이미 가입된 아이디가 있으며, 비밀번호가 일치하지 않습니다.")) {
-				model.addAttribute("msg", result);
-				return "member/register";
+		if(result.equals("비밀번호가 일치하지 않습니다.") || result.equals("아이디가 중복되었습니다.") || result.equals("이미 가입된 아이디가 있으며, 비밀번호가 일치하지 않습니다.")) {
+			model.addAttribute("msg", result);
+			return "member/register";
 		}
 		else if(result.equals("good")){
 			return "member/registerConform";

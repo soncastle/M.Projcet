@@ -1,6 +1,5 @@
 package com.acon.mapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Delete;
@@ -13,9 +12,12 @@ import org.apache.ibatis.annotations.Update;
 import com.acon.domain.Member;
 import com.acon.domain.MemberRequest;
 import com.acon.domain.MemberRespone;
-
 @Mapper
 public interface MemberMapper {
+	
+	@Insert("INSERT INTO users(userid, name, birth, password, gender, address, phone, create_at, role) "
+			+ "VALUES (#{userid}, #{name}, #{birth}, #{password}, #{gender}, #{address}, #{phone}, NOW(), 'admin')")
+	public void insertAdmin(Member dto);
 	
 	@Insert("INSERT INTO users(userid, name, birth, password, gender, address, phone, create_at, role) "
 			+ "VALUES (#{userid}, #{name}, #{birth}, #{password}, #{gender}, #{address}, #{phone}, NOW(), 'user')")

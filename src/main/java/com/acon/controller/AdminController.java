@@ -8,15 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.acon.domain.Member;
 import com.acon.service.MemberService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/admin")
@@ -30,12 +34,11 @@ public class AdminController {
 		return "admin/adminLogin";
 	}
 	
-	@PostMapping("/list")
 	@GetMapping("/list")
 	public String list(Model model) {
 		List<Member> users = (List<Member>)memberService.list();
 		model.addAttribute("users", users);
-		return "/admin/list";
+		return "admin/list";
 	}
 	
 	@PostMapping("/adminLogin")
@@ -63,13 +66,13 @@ public class AdminController {
 //	}
 	
 	@PostMapping("/passwordConform")
-    public ResponseEntity<Map<String, Object>> validatePassword(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> validatePassword(@RequestBody Map<String, String> request,
+    													@RequestBody @Valid Member member) {
+		
         // 비밀번호 확인 (비밀번호 일치 여부만 체크)
         String password = request.get("password");
         String passwordConfirm = request.get("passwordConfirm");
-
         Map<String, Object> response = new HashMap<>();
-
         if (password.equals(passwordConfirm)) {
             response.put("success", true);
             response.put("message", "비밀번호가 확인되었습니다.");
@@ -86,12 +89,12 @@ public class AdminController {
 		return "admin/adminRegister";
 	}
 	
-	@PostMapping("/domainRegister")
-	public void domainRegister(@RequestParam("userid") String userid,
-								@RequestParam("password") String password,
-								@RequestParam("passwordConform") String paswordConform,
-								@ModelAttribute Member member,
+	@PostMapping("/adminRegister")
+	public void domainRegister(@Valid @ModelAttribute Member member, Errors errors,
 								Model model) {
+		System.out.println(member);
+		System.out.println(errors.getFieldErrors().size());
+		
 		model.addAttribute("msg");
 	}
 }
