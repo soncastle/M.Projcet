@@ -12,6 +12,7 @@ import lombok.Data;
 public class Member {
 	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}", message = "아이디는 5글자 이상의 영문과 숫자로 구성되어야 합니다.")
 	private String userid;
+	@Pattern(regexp = "^[가-힣]{2,20}$", message = "이름은 2글자 이상의 한글만 허용됩니다.")
 	private String name;
 	private String birth;
 	@Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_\\-+=\\[\\]{}|;:'\",.<>?/])[a-zA-Z0-9~!@#$%^&*()_\\-+=\\[\\]{}|;:'\",.<>?/]{9,20}$", 

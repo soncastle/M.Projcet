@@ -66,21 +66,23 @@ public class AdminController {
 //	}
 	
 	@PostMapping("/passwordConform")
-    public ResponseEntity<Map<String, Object>> validatePassword(@RequestBody Map<String, String> request,
-    													@RequestBody @Valid Member member) {
-		
+    public ResponseEntity<Map<String, Object>> validatePassword(@RequestBody Map<String, String> request) {
         // 비밀번호 확인 (비밀번호 일치 여부만 체크)
         String password = request.get("password");
-        String passwordConfirm = request.get("passwordConfirm");
+        String passwordConform = request.get("passwordConform");
         Map<String, Object> response = new HashMap<>();
-        if (password.equals(passwordConfirm)) {
+        if (password.isEmpty() || passwordConform.isEmpty() ) {
             response.put("success", true);
-            response.put("message", "비밀번호가 확인되었습니다.");
-        } else {
+            response.put("message", "비밀번호나 비빌번호 확인란이 입력되지 않았습니다.");
+        }
+        else if(password.equals(passwordConform)) {
+        	response.put("success", true);
+        	response.put("message", "비밀번호가 일치합니다.");
+        }
+        else {
             response.put("success", false);
             response.put("message", "비밀번호가 일치하지 않습니다.");
         }
-
         return ResponseEntity.ok(response); // 결과 응답
     }
 	
@@ -95,6 +97,15 @@ public class AdminController {
 		System.out.println(member);
 		System.out.println(errors.getFieldErrors().size());
 		
+		if(errors.hasErrors()) {
+	        errors.getFieldErrors().forEach(error -> {
+	            System.out.println("Field: " + error.getField());
+	            System.out.println("Error Message: " + error.getDefaultMessage());
+	        });
+	        model.addAttribute("errors", errors.getFieldErrors());
+	        return; // 검증 실패 시 추가 작업 수행
+		}
 		model.addAttribute("msg");
+		System.out.println("Validation Passed");
 	}
 }

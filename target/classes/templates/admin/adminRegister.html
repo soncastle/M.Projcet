@@ -59,10 +59,6 @@
     	    const password = document.getElementById("password").value;
     	    const passwordConform = document.getElementById("passwordConform").value;
 
-    	    if (password !== passwordConform) {
-    	        document.getElementById("message").innerText = "비밀번호가 일치하지 않습니다.";
-    	        return;
-    	    }
 
     	    // 비밀번호를 서버로 비동기 요청
     	    fetch("/admin/passwordConform", {
@@ -70,7 +66,7 @@
     	        headers: {
     	            "Content-Type": "application/json",
     	        },
-    	        body: JSON.stringify({ password: password, passwordConfirm: passwordConform }), // 두 값을 서버로 전송
+    	        body: JSON.stringify({ password: password, passwordConform : passwordConform }), // 두 값을 서버로 전송
     	    })
     	        .then(response => response.json())
     	        .then(data => {
