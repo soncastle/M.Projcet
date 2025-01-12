@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 public class Member {
-	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}", message = "아이디는 5글자 이상의 영문과 숫자로 구성되어야 합니다.")
+	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}$", message = "아이디는 5글자 이상의 영문과 숫자로 구성되어야 합니다.")
 	private String userid;
 	@Pattern(regexp = "^[가-힣]{2,20}$", message = "이름은 2글자 이상의 한글만 허용됩니다.")
 	private String name;
@@ -20,8 +20,21 @@ public class Member {
 	private String password;
 	private String gender;
 	private String address;
-	@Pattern(regexp = "^[0-9]{11}$", message = "숫자만 입력 가능합니다.")
+	@Pattern(regexp = "^[0-9]{11}$", message = "11개의 숫자를 입력해주세요.")
 	private String phone;
 	private LocalDateTime create_at; 
 	private String role;
+	
+
+@Data
+public class Response{
+	private String userid;
+	private String name;
+	private String birth;
+	private String gender;
+	private String address;
+	private String phone;
+	private LocalDateTime create_at; 
+	private String role;
+}
 }

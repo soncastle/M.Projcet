@@ -87,25 +87,30 @@ public class AdminController {
     }
 	
 	@GetMapping("/adminRegister")
-	public String adminRegister() {
+	public String adminRegister(@ModelAttribute Member.Response response,
+								Model model) {
+		model.addAttribute("response", response);
 		return "admin/adminRegister";
 	}
 	
 	@PostMapping("/adminRegister")
-	public void domainRegister(@Valid @ModelAttribute Member member, Errors errors,
+	public String domainRegister(@Valid @ModelAttribute Member member, Errors errors,
+								@ModelAttribute  Member.Response response,
 								Model model) {
-		System.out.println(member);
-		System.out.println(errors.getFieldErrors().size());
+//		System.out.println(member);
+//		System.out.println(errors.getFieldErrors().size());
 		
 		if(errors.hasErrors()) {
 	        errors.getFieldErrors().forEach(error -> {
-	            System.out.println("Field: " + error.getField());
-	            System.out.println("Error Message: " + error.getDefaultMessage());
+//	            System.out.println("Field: " + error.getField());
+//	            System.out.println("Error Message: " + error.getDefaultMessage());
+	            model.addAttribute(error.getField() + "Error", error.getDefaultMessage());
 	        });
-	        model.addAttribute("errors", errors.getFieldErrors());
-	        return; // 검증 실패 시 추가 작업 수행
+	        model.addAttribute("response", response);
+	        return "admin/adminRegister"; // 검증 실패 시 추가 작업 수행
 		}
-		model.addAttribute("msg");
+		model.addAttribute("msg", "회원가입이 완료되었습니다.");
 		System.out.println("Validation Passed");
+		return "admin/login";
 	}
 }

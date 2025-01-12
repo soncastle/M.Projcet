@@ -11,13 +11,26 @@
         <h2>회원가입</h2>
         <form action="/admin/adminRegister" method="POST">
             <div class="form-group">
+                <label for="userid">아이디</label>
+                <input type="text" id="userid" name="userid" placeholder="아이디를 입력하세요" th:value="${response.userid}" required>
+                <div th:if="${useridError}" style="color: red">
+  					  <span th:text="${useridError}"></span>
+				</div>
+            </div>
+            <div class="form-group">
                 <label for="name">이름</label>
-                <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+                <input type="text" id="name" name="name" placeholder="이름을 입력하세요" th:value="${response.name}" required>
+                <div th:if="${nameError}" style="color: red">
+  					  <span th:text="${nameError}"></span>
+				</div>
             </div>
 
             <div class="form-group">
                 <label for="password">비밀번호</label>
                 <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                <div th:if="${passwordError}" style="color: red">
+  					  <span th:text="${passwordError}"></span>
+				</div>
             </div>
 
             <div class="form-group">
@@ -32,21 +45,21 @@
             </div>
 			          <div class="form-group">
                 <label for="birth">생년월일</label>
-                <input id="birth" name="birth" >
+                <input id="birth" type="date" name="birth"  th:value="${response.birth}">
             </div>
-            <div th:if="${birthMsgNumber}">
-                ${birthMsgNumber}
-            </div>
+                <div th:if="${passwordError}" style="color: red">
+  					  <span th:text="${passwordError}"></span>
+				</div>
             <div class="form-group">
                 <label for="phone">전화번호</label>
-                <input id="phone" name="phone" placeholder="010-1234-5678" >
+                <input id="phone" name="phone" placeholder="010-1234-5678" th:value="${response.phone}">
             </div>
-            <div th:if="${phoneMsgNumber}">
-                ${phoneMsgNumber}
-            </div>
+                <div th:if="${phoneError}" style="color: red">
+  					  <span th:text="${phoneError}"></span>
+				</div>
             <div class="form-group">
                 <label for="address">부서</label>
-                <input type="text" id="address" name="address" placeholder="부서를 입력하세요" >
+                <input type="text" id="address" name="address" placeholder="부서를 입력하세요" th:value="${response.address}">
             </div>
             <button type="submit" class="signup-btn">회원가입</button>
         </form>
