@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acon.domain.Member;
+import com.acon.service.AdminService;
 import com.acon.service.MemberService;
 
 import jakarta.validation.Valid;
@@ -28,6 +29,7 @@ public class AdminController {
 
 	@Autowired
 	private MemberService memberService;
+	private AdminService adminservice;
 	
 	@GetMapping("/")
 	public String adminsLogin() {
@@ -68,6 +70,7 @@ public class AdminController {
 	@PostMapping("/passwordConform")
     public ResponseEntity<Map<String, Object>> validatePassword(@RequestBody Map<String, String> request) {
         // 비밀번호 확인 (비밀번호 일치 여부만 체크)
+//		 = (ResponseEntity<Map<String, Object>>)adminservice.validatePassword(request.get("password"), request.get("passwordConform"));
         String password = request.get("password");
         String passwordConform = request.get("passwordConform");
         Map<String, Object> response = new HashMap<>();

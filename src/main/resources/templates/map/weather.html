@@ -7,6 +7,7 @@
 </head>
 <body>
     <h1>날씨 데이터 조회</h1>
+    
 
     <!-- 날짜와 좌표 입력 폼 -->
     <form id="weatherForm">
@@ -17,7 +18,7 @@
         <input type="text" id="baseTime" name="baseTime" required><br><br>
 
         <label for="nx">NX:</label>
-        <input type="text" id="nx" name="nx" value="60" required><br><br>
+        <input type="text" id="nx" name="nx" value="55" required><br><br>
 
         <label for="ny">NY:</label>
         <input type="text" id="ny" name="ny" value="127" required><br><br>
@@ -41,11 +42,14 @@
                 const day = String(now.getDate()).padStart(2, '0');
                 const baseDate = `${year}${month}${day}`;
 
-                // 현재 시간 (기상청 API 기준으로 가장 가까운 3시간 단위 HHMM 형식)
-                const hours = now.getHours();
+                // 현재 시간 (기상청 API 기준 1시간 단위로 가장 가까운 이전 시간)
+                let hours = now.getHours();
                 const minutes = now.getMinutes();
-                const roundedHours = hours - (hours % 3); // 3시간 단위로 내림
-                const baseTime = `${String(roundedHours).padStart(2, '0')}00`;
+
+                if (minutes < 40) {
+                    hours -= 1; // 40분 이전이면 한 시간 전 데이터 요청
+                }
+                const baseTime = `${String(hours).padStart(2, '0')}00`;
 
                 // HTML 입력 필드에 설정
                 document.getElementById('baseDate').value = baseDate;
@@ -66,12 +70,14 @@
                 const ny = document.getElementById('ny').value;
 
                 // 기상청 API URL
-                const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=fT2vGIbykMvAcCsiXiq2e82IeJrI2Uh6cni7eyh9jHn2cYVup9%2BWdnE8vb%2FYoChOXBGIdWSfD%2Fax1ZNrRYhy8Q%3D%3D&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}&numOfRows=10&pageNo=1&dataType=JSON`;
+                const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=fT2vGIbykMvAcCsiXiq2e82IeJrI2Uh6cni7eyh9jHn2cYVup9%2BWdnE8vb%2FYoChOXBGIdWSfD%2Fax1ZNrRYhy8Q%3D%3D&pageNo=1&numOfRows=1000&dataType=json&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
+
                 // Fetch 요청 보내기
                 fetch(url)
                     .then(response => response.json())
                     .then(data => {
-                        const result = data.response.header.resultCode === '00'
+                        // API 응답 처리
+                        const result = data.response && data.response.header.resultCode === '00'
                             ? data.response.body.items.item
                             : '데이터를 불러올 수 없습니다.';
                         document.getElementById('weatherResult').textContent = JSON.stringify(result, null, 2);
