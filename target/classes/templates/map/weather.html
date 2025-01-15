@@ -8,7 +8,6 @@
 <body>
     <h1>날씨 데이터 조회</h1>
     
-[[${serviceKey}]]
     <!-- 날짜와 좌표 입력 폼 -->
     <form id="weatherForm">
         <label for="baseDate">날짜 (YYYYMMDD):</label>
@@ -30,7 +29,7 @@
     <pre id="weatherResult"></pre>
 
     <!-- JavaScript -->
-    <script>
+    <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function () {
             // 현재 날짜와 시간을 설정하는 함수
             const setCurrentDateTime = () => {
@@ -69,6 +68,7 @@
                 const nx = document.getElementById('nx').value;
                 const ny = document.getElementById('ny').value;
 
+                const serviceKey = [[${serviceKey}]];
                 // 기상청 API URL
                 const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=1000&dataType=json&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
 
