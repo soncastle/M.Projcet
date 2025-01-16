@@ -6,8 +6,13 @@
     
 </head>
 <body>
+    x좌표: <input id=X type="text" value="37.5173319258532"></div>
+    y좌표: <input id=Y type="text" value="127.047377408384"></div>
+    X : <div id=x></div>
+    y : <div id=y></div>
     <div id="clickLatlng"></div>
-검색: <input id=x type="text" value="서울시 은평구 연서로9길"/> <br>
+검색: <input id=ADDR type="text" value="서울시 강남구"/> <br>
+출력할 값: <input id=WRITE type="text" value="GG"/> <br>
 <button onclick="buttonClick()">찾기</button>
 
 <script>
@@ -22,8 +27,7 @@
     mapOption = {
         center: new kakao.maps.LatLng(50, 100), // 지도의 중심좌표
         level: 3 // 지도의 확대 레벨
-    };  
-    
+    }; 
     // 지도를 생성합니다    
     var map = new kakao.maps.Map(mapContainer, mapOption); 
     
@@ -32,16 +36,24 @@
     
     // 주소로 좌표를 검색합니다
     function buttonClick(){
-    const X = document.getElementById("x").value;
-    
+    const ADDR = document.getElementById("ADDR").value;
+    const WRITE = document.getElementById("WRITE").value;
+    //좌표로 찾기용
+    const X = document.getElementById("X").value;
+    const Y = document.getElementById("Y").value;
 
-geocoder.addressSearch(X, function(result, status) { // 문자로만 받아야 함. 따라서 바로 대입!! addressSearch!!
+geocoder.addressSearch(ADDR, function(result, status) { // 문자로만 받아야 함. 따라서 바로 대입!! addressSearch!!
 
     // 정상적으로 검색이 완료됐으면 
      if (status === kakao.maps.services.Status.OK) {
 
-        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+        //위경도로 찾기
+        // var coords = new kakao.maps.LatLng(X, Y);
 
+        // 검색으로 찾기
+        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+        document.getElementById("x").textContent = result[0].y
+        document.getElementById("y").textContent = result[0].x
         // 결과값으로 받은 위치를 마커로 표시합니다
         var marker = new kakao.maps.Marker({
             map: map,
@@ -50,7 +62,7 @@ geocoder.addressSearch(X, function(result, status) { // 문자로만 받아야 �
 
         // 인포윈도우로 장소에 대한 설명을 표시합니다
         var infowindow = new kakao.maps.InfoWindow({
-            content: `<div style="width:150px;text-align:center;padding:6px 0;">${X}</div>`
+            content: `<div style="width:150px;text-align:center;padding:6px 0;">위치:${ADDR} || 출력값: ${WRITE}</div>`
         });
         infowindow.open(map, marker);
 
@@ -59,22 +71,9 @@ geocoder.addressSearch(X, function(result, status) { // 문자로만 받아야 �
     } 
 })
 
-// kakao.maps.event.addListener(map, 'click', function(mouseEvent) {        
+};
+
     
-//     // 클릭한 위도, 경도 정보를 가져옵니다 
-//     var latlng = mouseEvent.latLng; 
-    
-//     // 마커 위치를 클릭한 위치로 옮깁니다
-//     marker.setPosition(latlng);
-    
-//     var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
-//     message += '경도는 ' + latlng.getLng() + ' 입니다';
-    
-//     var resultDiv = document.getElementById('clickLatlng'); 
-//     resultDiv.innerHTML = message;
-    
-// })
-};    
 </script>
 </body>
 </html>
