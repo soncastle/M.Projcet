@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinate Converter</title>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script th:inline="javascript">
+        // 기상청 좌표 변환 기본 상수
+        const RE = 6371.00877; // 지구 반경(km)
+        const GRID = 5.0; // 격자 간격(km)
+        const SLAT1 = 30.0; // 투영 위도1(degree)
+        const SLAT2 = 60.0; // 투영 위도2(degree)
+        const OLON = 126.0; // 기준점 경도(degree)
+        const OLAT = 38.0; // 기준점 위도(degree)
+        const XO = 43; // 기준점 X좌표(GRID)
+        const YO = 136; // 기준점 Y좌표(GRID)
+
+        // LCC DFS 좌표변환 함수
+        function dfs_xy_conv(code, v1, v2) {
+            const DEGRAD = Math.PI / 180.0;
+            const RADDEG = 180.0 / Math.PI;
+
+            const re = RE / GRID;
+            const slat1 = SLAT1 * DEGRAD;
+            const slat2 = SLAT2 * DEGRAD;
+            const olon = OLON * DEGRAD;
+            const olat = OLAT * DEGRAD;
+
+            let sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+            sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+            const sf = Math.pow(Math.tan(Math.PI * 0.25 + slat1 * 0.5), sn) * Math.cos(slat1) / sn;
+            const ro = re * sf / Math.pow(Math.tan(Math.PI * 0.25 + olat * 0.5), sn);
+
+            const rs = {};
+            if (code === "toXY") {
+                rs['lat'] = v1;
+                rs['lng'] = v2;
+                const ra = re * sf / Math.pow(Math.tan(Math.PI * 0.25 + v1 * DEGRAD * 0.5), sn);
+                let theta = v2 * DEGRAD - olon;
+                if (theta > Math.PI) theta -= 2.0 * Math.PI;
+                if (theta < -Math.PI) theta += 2.0 * Math.PI;
+                theta *= sn;
+                rs['x'] = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+                rs['y'] = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
+            } else {
+                rs['x'] = v1;
+                rs['y'] = v2;
+                const xn = v1 - XO;
+                const yn = ro - v2 + YO;
+                const ra = Math.sqrt(xn * xn + yn * yn);
+                const alat = 2.0 * Math.atan(Math.pow(re * sf / ra, 1.0 / sn)) - Math.PI * 0.5;
+                let theta = xn === 0.0 ? 0.0 : Math.atan2(xn, yn);
+                const alon = theta / sn + olon;
+                rs['lat'] = alat * RADDEG;
+                rs['lng'] = alon * RADDEG;
+            }
+            return rs;
+        }
+
+        // 위경도 -> GridXY
+        function fnLatLon2XY() {
+            const strLatLon = $("#taLatLon").val();
+            const lines = strLatLon.split("\n").map(line => line.trim()).filter(line => line);
+            let strXY = "";
+
+            for (const line of lines) {
+                const [lat, lon] = line.split(",").map(Number);
+                if (isNaN(lat) || isNaN(lon)) {
+                    alert("숫자 값이 아니거나 데이터 형식이 맞지 않습니다.");
+                    return;
+                }
+                const xy = dfs_xy_conv("toXY", lat, lon);
+                strXY += `${xy.x}, ${xy.y}\n`;
+            }
+
+            $('#taXY').val(strXY.trim());
+        }
+
+        // 페이지 로드 후 자동 실행
+        $(document).ready(function() {
+            // 기본 위경도 값
+            const defaultLatLon = "37.579871128849334,126\n35.179554,129.075642";
+            $("#taLatLon").val(defaultLatLon);
+            fnLatLon2XY(); // 자동 변환
+        });
+    </script>
+</head>
+<body>
+    <h1>Coordinate Converter</h1>
+    <textarea id="taLatLon" rows="5" cols="40" placeholder="위도, 경도 입력"></textarea>
+    <textarea id="taXY" rows="5" cols="40" placeholder="X, Y 결과"></textarea>
+</body>
+</html>

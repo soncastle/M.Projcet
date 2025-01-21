@@ -1,93 +1,158 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>날씨 조회</title>
-</head>
-<body>
-    <h1>날씨 데이터 조회</h1>
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8"> 
+  <title>Document</title>
+
+  <style>
+    textarea {width:350px; height:300px; float:left}
+    .btnGroup {
+        float:left ;
+        padding: 25px;
+    }
+  </style>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script>
+
+  
+    // 위경도 -> GridXY
+    function fnLatLon2XY() {
+        var strLatLon = $.trim($("#taLatLon").val());
+        if(!strLatLon) { alert("위경도 데이터를 입력하여 주십시오."); return;}
+        var lines = strLatLon.split(String.fromCharCode(10)); //줄단위로 분할
+        var strXY = "";
+        for(var i = 0, len = lines.length; i < len; i++) {
+            if(lines[i] == "") continue; //빈줄은 무시하고 통과
+            var latlon = lines[i].split(",");
+            var lat = latlon[0], lon = latlon[1];
+            if(!lat||!lon||isNaN(lat)||isNaN(lon)) {
+                alert("숫자 값이 아니거나 데이터 형식이 맞지 않습니다.");
+                return;
+            }
+            var xy = dfs_xy_conv("toXY", lat, lon);
+            strXY += xy.x + ", " + xy.y + String.fromCharCode(10);
+        }
+        
+        $('#taXY').val(strXY);
+
+    }
+    // 위경도 <- GridXY
+    function fnXY2LatLon() {
+
+        var strXY = $.trim($("#taXY").val());
+        if (! strXY) { alert ("Grid XY 데이터를 입력하여 주십시오."); return; }
+  
+        var lines = strXY.split(String.fromCharCode(10));
+        var strLatLon = "";
+        for(var i = 0, len = lines.length; i < len; i++) {
+            if (lines[i] == '')  continue;       
     
+            var xy = lines[i].split(",");
+            var x = xy[0], y = xy[1];
+            if (!x || !y || isNaN(x) || isNaN(y)) {
+                alert("숫자 값이 아니거나 데이터 형식이 맞지 않습니다.");
+                return;
+            }
+    
+            var ll = dfs_xy_conv("toLL", x, y);
+            strLatLon += ll.lat + ", " + ll.lng + String.fromCharCode(10);
+    
+        }
+        $("#taLatLon").val(strLatLon);
+    }
 
-    <!-- 날짜와 좌표 입력 폼 -->
-    <form id="weatherForm">
-        <label for="baseDate">날짜 (YYYYMMDD):</label>
-        <input type="text" id="baseDate" name="baseDate" required><br><br>
+    //----------------------------------------------------------
+    // 기상청 홈페이지에서 발췌한 변환 함수
+    //
+    // LCC DFS 좌표변환을 위한 기초 자료
+    //
+    var RE = 6371.00877; // 지구 반경(km)
+    var GRID = 5.0; // 격자 간격(km)
+    var SLAT1 = 30.0; // 투영 위도1(degree)
+    var SLAT2 = 60.0; // 투영 위도2(degree)
+    var OLON = 126.0; // 기준점 경도(degree)
+    var OLAT = 38.0; // 기준점 위도(degree)
+    var XO = 43; // 기준점 X좌표(GRID)
+    var YO = 136; // 기1준점 Y좌표(GRID)
 
-        <label for="baseTime">시간 (HHMM):</label>
-        <input type="text" id="baseTime" name="baseTime" required><br><br>
+// LCC DFS 좌표변환 ( code : 
+//          "toXY"(위경도->좌표, v1:위도, v2:경도), 
+//          "toLL"(좌표->위경도,v1:x, v2:y) )
+//
 
-        <label for="nx">NX:</label>
-        <input type="text" id="nx" name="nx" value="55" required><br><br>
-
-        <label for="ny">NY:</label>
-        <input type="text" id="ny" name="ny" value="127" required><br><br>
-
-        <button type="submit">날씨 조회</button>
-    </form>
-
-    <h2>날씨 결과:</h2>
-    <pre id="weatherResult"></pre>
-
-    <!-- JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 현재 날짜와 시간을 설정하는 함수
-            const setCurrentDateTime = () => {
-                const now = new Date();
-
-                // 현재 날짜 (YYYYMMDD 형식)
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const baseDate = `${year}${month}${day}`;
-
-                // 현재 시간 (기상청 API 기준 1시간 단위로 가장 가까운 이전 시간)
-                let hours = now.getHours();
-                const minutes = now.getMinutes();
-
-                if (minutes < 40) {
-                    hours -= 1; // 40분 이전이면 한 시간 전 데이터 요청
+    function dfs_xy_conv(code, v1, v2) {
+        var DEGRAD = Math.PI / 180.0;
+        var RADDEG = 180.0 / Math.PI;
+        
+        var re = RE / GRID;
+        var slat1 = SLAT1 * DEGRAD;
+        var slat2 = SLAT2 * DEGRAD;
+        var olon = OLON * DEGRAD;
+        var olat = OLAT * DEGRAD;
+        
+        var sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+        sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+        var sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+        sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+        var ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+        ro = re * sf / Math.pow(ro, sn);
+        var rs = {};
+        if (code == "toXY") {
+            rs['lat'] = v1;
+            rs['lng'] = v2;
+            var ra = Math.tan(Math.PI * 0.25 + (v1) * DEGRAD * 0.5);
+            ra = re * sf / Math.pow(ra, sn);
+            var theta = v2 * DEGRAD - olon;
+            if (theta > Math.PI) theta -= 2.0 * Math.PI;
+            if (theta < -Math.PI) theta += 2.0 * Math.PI;
+            theta *= sn;
+            rs['x'] = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+            rs['y'] = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
+        }
+        else {
+            rs['x'] = v1;
+            rs['y'] = v2;
+            var xn = v1 - XO;
+            var yn = ro - v2 + YO;
+            ra = Math.sqrt(xn * xn + yn * yn);
+            if (sn < 0.0) - ra;
+            var alat = Math.pow((re * sf / ra), (1.0 / sn));
+            alat = 2.0 * Math.atan(alat) - Math.PI * 0.5;
+            
+            if (Math.abs(xn) <= 0.0) {
+                theta = 0.0;
+            }
+            else {
+                if (Math.abs(yn) <= 0.0) {
+                    theta = Math.PI * 0.5;
+                    if (xn < 0.0) - theta;
                 }
-                const baseTime = `${String(hours).padStart(2, '0')}00`;
+                else theta = Math.atan2(xn, yn);
+            }
+            var alon = theta / sn + olon;
+            rs['lat'] = alat * RADDEG;
+            rs['lng'] = alon * RADDEG;
+        }
+        return rs;
+    }
 
-                // HTML 입력 필드에 설정
-                document.getElementById('baseDate').value = baseDate;
-                document.getElementById('baseTime').value = baseTime;
-            };
+  </script>
 
-            // 현재 날짜와 시간을 자동으로 설정
-            setCurrentDateTime();
+ </head>
+ <body>    
+    <textarea id="taLatLon" >37.579871128849334, 126.98935225645432
+35.101148844565955, 129.02478725562108
+33.500946412305076, 126.54663058817043</textarea>
+    <div class="btnGroup">
+        <button onclick="fnLatLon2XY()">위경도 -> GridXY</button><br/><br/>
+        <button onclick="fnXY2LatLon()">위경도 &lt;- GridXY</button>
+    </div>
 
-            // 폼 제출 이벤트 처리
-            document.getElementById('weatherForm').addEventListener('submit', function (e) {
-                e.preventDefault(); // 폼 제출 기본 동작 방지
-
-                // 사용자 입력 값 가져오기
-                const baseDate = document.getElementById('baseDate').value;
-                const baseTime = document.getElementById('baseTime').value;
-                const nx = document.getElementById('nx').value;
-                const ny = document.getElementById('ny').value;
-
-                // 기상청 API URL
-                const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=fT2vGIbykMvAcCsiXiq2e82IeJrI2Uh6cni7eyh9jHn2cYVup9%2BWdnE8vb%2FYoChOXBGIdWSfD%2Fax1ZNrRYhy8Q%3D%3D&pageNo=1&numOfRows=1000&dataType=json&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
-
-                // Fetch 요청 보내기
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => { //response.json()변환된 데이터
-                        // API 응답 처리
-                        const result = data.response && data.response.header.resultCode === '00' // 00일경우 성공이며 00으로 하는게 관례. api 담당자 맘대루 정해도 됨!! HTTP 상태 코드 정상 : 200  result코드
-                            ? data.response.body.items.item
-                            : '데이터를 불러올 수 없습니다.';
-                        document.getElementById('weatherResult').textContent = JSON.stringify(result, null, 2);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('weatherResult').textContent = '날씨 데이터를 가져오는 중 오류가 발생했습니다.';
-                    });
-            });
-        });
-    </script>
-</body>
+    <textarea id="taXY"></textarea>
+  
+ </body>
+ <script>
+ 	document.getelementby
+ </script>
 </html>
+

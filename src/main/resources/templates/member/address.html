@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>키워드 검색</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        li:hover {
+            background-color: #f9f9f9;
+        }
+        .details {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>키워드 검색 결과</h1>
+    <form onsubmit="searchKeyword(); return false;">
+        키워드: <input type="text" id="keyword" placeholder="키워드를 입력하세요">
+        <button type="submit">검색</button>
+    </form>
+
+    <ul id="resultList"></ul>
+
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=75bdd1f3923ca7511f9238d28b1c4b36&libraries=services"></script>
+    <script>
+        // Kakao Maps API 사용하여 키워드 검색
+        function searchKeyword() {
+            const keyword = document.getElementById('keyword').value.trim(); // <--검색하는곳!!!
+            const resultList = document.getElementById('resultList');  // 출력하는 곳!!!!
+
+            // 입력된 키워드가 없을 경우 경고
+            if (!keyword) {
+                alert('키워드를 입력해주세요!');
+                return;
+            }
+
+            // 기존 결과 초기화
+            resultList.innerHTML = '';
+
+            // Kakao Places 서비스 초기화
+            const ps = new kakao.maps.services.Places();
+
+            // 키워드로 장소 검색
+            ps.keywordSearch(keyword, function (data, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    // 검색 결과 표시
+                    data.forEach(place => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <strong>${place.place_name}</strong>
+                            <div class="details">
+                                주소: ${place.address_name || '정보 없음'}<br>
+                                위도: ${place.y}, 경도: ${place.x}
+                            </div>
+                        `;
+                        li.onclick = () => alert(                                          // 출력하는곳!!! -> 출력 형식 지정!! -> 클릭시 행동 지정!!
+                            `선택한 장소: ${place.place_name}\n주소: ${place.address_name}\n위도: ${place.y}, 경도: ${place.x}`
+                        );
+                        resultList.appendChild(li);
+                    });
+                } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+                    alert('검색 결과가 없습니다.');
+                } else {
+                    alert('검색 중 오류가 발생했습니다.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

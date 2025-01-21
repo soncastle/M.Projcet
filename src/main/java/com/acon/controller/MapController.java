@@ -39,5 +39,11 @@ public class MapController {
 		model.addAttribute("serviceKey", serviceKey);
 		return "map/weather2";
 	}
+	
+	@GetMapping("/address")
+	public String address() {
+		return "member/address";
+	}
+	
 
 }
