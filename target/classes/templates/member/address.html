@@ -77,17 +77,31 @@
                                 위도: ${place.y}, 경도: ${place.x}
                             </div>
                         `;
-                        li.onclick = () => alert(                                          // 출력하는곳!!! -> 출력 형식 지정!! -> 클릭시 행동 지정!!
-                            `선택한 장소: ${place.place_name}\n주소: ${place.address_name}\n위도: ${place.y}, 경도: ${place.x}`
-                        );
+                        li.onclick = () =>                                         // 출력하는곳!!! -> 출력 형식 지정!! -> 클릭시 행동 지정!!
+                        sendSelectedData({
+                            placeName: place.place_name,
+                            address: place.address_name,
+                            latitude: place.y,
+                            longitude: place.x
+                        });
+                        ;
                         resultList.appendChild(li);
-                    });
+                    }); 
                 } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
                     alert('검색 결과가 없습니다.');
                 } else {
                     alert('검색 중 오류가 발생했습니다.');
                 }
             });
+        }
+        
+        function sendSelectedData(data) {
+            if (window.opener && !window.opener.closed) {
+                window.opener.receiveData(data); // 부모 창의 함수 호출
+                window.close(); // 팝업 닫기
+            } else {
+                alert('부모 창이 존재하지 않습니다.');
+            }
         }
     </script>
 </body>

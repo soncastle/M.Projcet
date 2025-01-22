@@ -16,7 +16,7 @@ public class MapController {
 	public String map(Model model) {
 		String serviceKey = ServiceService.key("map");
 		model.addAttribute("serviceKey", serviceKey);
-		return "map/map";
+		return "map/map4";
 	}
 	
 	@PostMapping("/map")

@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
-<link rel="stylesheet" th:href="@{/css/register.css}">
+    <link rel="stylesheet" th:href="@{/css/register.css}">
 </head>
+<script src="/js/register.js"></script>
 <body>
  <div th:if="${msg}">
         <script th:inline="javascript">
@@ -48,18 +49,24 @@
 
             <div class="form-group">
                 <label for="address">주소</label>
-                <input type="text" id="address" name="address" placeholder="주소를 입력하세요" th:value="${memberRequest.address}?:_" required>
-                <button id="addr" onClick="ADDR(event)">gg</button>
+                <input type="text" id="address" name="address" placeholder="주소를 입력하세요" th:value="${memberRequest.phone}?:_" required>
+                <button id="addr" onClick="ADDR(event)">주소 검색</button>
             </div>
+            
             <script>
-            const ADDR = (event) => {
-           	    event.preventDefault();
-                let size = "width = 650px, height=550px, top=300px, left=300px, scrollbars=yes";
-                let openUrl = '/map/address'
-                window.open(openUrl, 'pop', size);
-            	
-            }
-                        	
+                const ADDR = (event) => {
+                    event.preventDefault();
+                    let size = "width = 650px, height=550px, top=300px, left=300px, scrollbars=yes";
+                    let openUrl = '/map/address';
+                    window.open(openUrl, 'pop', size);
+                }
+            </script>
+
+            <script>
+                function receiveData(data) {
+                    document.getElementById('address').value = `${data.address}`;
+                    alert(`선택된 장소: ${data.placeName}\n주소: ${data.address}\n위도: ${data.latitude}, 경도: ${data.longitude}`);
+                }
             </script>
 
             <div class="form-group">
@@ -73,7 +80,6 @@
                     </label>
                 </div>
             </div>
-
             <button type="submit" class="signup-btn">회원가입</button>
         </form>
     </div>
